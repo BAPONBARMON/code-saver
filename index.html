@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Disk Code Saver</title>
+  <style>
+    body {
+      font-family: Consolas, monospace;
+      margin: 15px;
+      background: #000;
+      color: #00ff00;
+    }
+    h2 {
+      text-align: center;
+      color: #00ff00;
+      text-shadow: 0 0 8px #00ff00;
+    }
+    textarea {
+      display: block;
+      margin: 0 auto 12px auto;
+      width: 95%;
+      height: 250px;
+      padding: 12px;
+      border: 1px solid #00ff00;
+      border-radius: 8px;
+      background: #000;
+      color: #00ff00;
+      resize: none;
+      font-size: 14px;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .row input, .row select {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #00ff00;
+      background: #000;
+      color: #00ff00;
+      font-weight: bold;
+    }
+    button {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #00ff00;
+      background: #000;
+      color: #00ff00;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: #00ff00;
+      color: #000;
+    }
+    .bottom-left {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      opacity: 0.7;
+      color: #00ff00;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📂 Code Saver</h2>
+  
+  <textarea id="code" placeholder="👉 Paste your code here..."></textarea>
+  
+  <div class="row">
+    <input type="text" id="filename" placeholder="File name">
+    <select id="extension">
+      <option value=".txt">.txt</option>
+      <option value=".html">.html</option>
+      <option value=".json">.json</option>
+      <option value=".js">.js</option>
+      <option value=".css">.css</option>
+      <option value=".py">.py</option>
+      <option value=".java">.java</option>
+      <option value=".cpp">.cpp</option>
+      <option value=".md">.md</option>
+    </select>
+    <button onclick="saveFile()">💾 Save</button>
+  </div>
+
+  <div class="bottom-left">
+    <button onclick="clearText()">🗑 Clear</button>
+    <button onclick="pasteText()">📋 Paste</button>
+  </div>
+
+  <div class="footer">⚡ Powered by BAPON BARMON ⚡</div>
+
+  <script>
+    async function saveFile() {
+      let code = document.getElementById("code").value;
+      let filename = document.getElementById("filename").value.trim();
+      let extension = document.getElementById("extension").value;
+
+      if (!filename) {
+        customAlert("⚠️ कृपया file name डालें!");
+        return;
+      }
+
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: filename + extension,
+          types: [{
+            description: "Code Files",
+            accept: { "text/plain": [extension] },
+          }],
+        });
+
+        const writable = await handle.createWritable();
+        await writable.write(code);
+        await writable.close();
+
+        customAlert("✅ File successfully saved to disk!");
+      } catch (err) {
+        console.log("Save cancelled or error:", err);
+      }
+    }
+
+    function clearText() {
+      document.getElementById("code").value = "";
+      customAlert("🗑 Cleared!");
+    }
+
+    async function pasteText() {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById("code").value += text;
+        customAlert("📋 Text pasted from clipboard!");
+      } catch (err) {
+        customAlert("❌ Clipboard access not allowed!");
+      }
+    }
+
+    function customAlert(message) {
+      let popup = document.createElement("div");
+      popup.innerText = message;
+      popup.style.position = "fixed";
+      popup.style.top = "20px";
+      popup.style.right = "20px";
+      popup.style.background = "#000";
+      popup.style.color = "#00ff00";
+      popup.style.border = "1px solid #00ff00";
+      popup.style.padding = "10px 20px";
+      popup.style.borderRadius = "8px";
+      popup.style.boxShadow = "0 0 10px #00ff00";
+      popup.style.zIndex = "9999";
+      document.body.appendChild(popup);
+      setTimeout(() => popup.remove(), 2500);
+    }
+  </script>
+
+</body>
+</html>
